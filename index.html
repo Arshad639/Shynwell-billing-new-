@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SHYNWELL - Premium Covering Jewellery</title>
+<script>/* Runs BEFORE the first paint: the entrance animation is on from the very first frame, so nothing of the app can flash. */
+(function(){var d=document.documentElement;try{if(sessionStorage.getItem('shyn_skip'))sessionStorage.removeItem('shyn_skip');else if(!sessionStorage.getItem('shyn_tok'))d.classList.add('intro-on');if(sessionStorage.getItem('shyn_tok'))d.classList.add('resuming');}catch(e){d.classList.add('intro-on');}})();</script>
+<link rel="preconnect" href="https://script.google.com" crossorigin><link rel="preconnect" href="https://gcjframqlnfijwjjyltc.supabase.co" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#040308">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SHYNWELL">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Outfit:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+</head>
+<body>
+<!-- ================= ENTRANCE INTRO (pure CSS/SVG, no network, painted on the first frame) ================= -->
+<div id="intro" role="presentation" aria-hidden="true">
+  <div class="i-stage">
+    <video class="i-vid" muted playsinline webkit-playsinline preload="auto" disablepictureinpicture tabindex="-1"></video>
+    <div class="i-logo"></div>
+  </div>
+</div>
+<script src="intro.js"></script>
+<div id="shell">
+
+<!-- ================= LOGIN ================= -->
+<section id="loginView" class="min-h-screen flex flex-col items-center justify-center px-4 py-10 text-center">
+  <span class="brand-logo lg float" style="--w:clamp(92px,28vw,132px)" role="img" aria-label="SHYNWELL logo"></span>
+  <h1 class="serif metal text-4xl sm:text-7xl font-extrabold tracking-wider mt-3">SHYNWELL</h1>
+  <p class="mt-2 text-lg sm:text-xl" style="color:var(--mut)">Welcome to SHYNWELL - Premium Covering Jewellery</p>
+  <div class="badge mt-5"><i class="fa-solid fa-circle-check"></i>ARSHAD &mdash; Founder &amp; Owner</div>
+
+  <form id="loginForm" class="glass neon w-full max-w-sm mt-8 p-5 sm:p-6 text-left rise" autocomplete="on" novalidate>
+    <h2 class="serif text-xl mb-4">Owner sign in</h2>
+    <label class="lbl" for="lu">Username</label>
+    <input id="lu" class="inp mb-3" autocomplete="username" maxlength="64" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <label class="lbl" for="lp">Password</label>
+    <div class="relative mb-2"><input id="lp" type="password" class="inp pr-10" autocomplete="current-password" maxlength="128" spellcheck="false" required>
+      <button type="button" class="absolute right-3 top-3 text-gray-400" onclick="togglePw()" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>
+    <p id="lerr" class="text-sm min-h-5" style="color:#ff6b81" role="alert" aria-live="polite"></p>
+    <div id="lockBox" class="lockbox" role="alert"></div>
+    <button id="loginBtn" class="btn pulse-glow w-full mt-2"><i class="fa-solid fa-unlock-keyhole"></i>Enter dashboard</button>
+    <button type="button" onclick="openForgot()" class="mt-4 text-sm underline" style="color:var(--cy)">Forgot password?</button>
+    <button type="button" id="installBtn" onclick="installApp()" class="btn btn-ghost w-full mt-4 hidden"><i class="fa-solid fa-download"></i>Install SHYNWELL app</button>
+  </form>
+</section>
+
+<div id="forgotModal" class="modal"><div class="glass neon w-full max-w-sm p-5 sm:p-6" style="background:#0e0e16">
+  <div class="mhead"><div class="flex items-center gap-3 min-w-0"><span class="brand-logo" style="--w:30px"></span><h3 class="serif text-xl">Reset password</h3></div><button class="mx" onclick="closeForgot()" aria-label="Close">&times;</button></div>
+  <div id="fs1">
+    <p class="text-sm mb-3" style="color:var(--mut)">Enter the registered admin email. A 6-digit code will be sent to it.</p>
+    <label class="lbl" for="fgEmail">Admin email</label>
+    <input id="fgEmail" type="email" class="inp mb-3" autocomplete="email" inputmode="email" maxlength="254" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
+    <button id="sendBtn" class="btn pulse-glow w-full mt-1" onclick="sendOtp()"><i class="fa-solid fa-paper-plane"></i>Send OTP</button>
+  </div>
+  <div id="fs2" class="hidden">
+    <p id="otpSent" class="text-sm text-center" style="color:var(--mut)"></p>
+    <input id="otpIn" class="inp otp text-center my-3" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="------" oninput="otpInput()" aria-label="6-digit OTP">
+    <p class="text-center text-sm mb-3">Expires in <b id="otpTime" style="color:var(--gd)">05:00</b></p>
+    <label class="lbl" for="fgNew">New password</label>
+    <input id="fgNew" type="password" class="inp mb-3" autocomplete="new-password" maxlength="128" placeholder="At least 8 characters, a letter and a number">
+    <label class="lbl" for="fgConf">Confirm new password</label>
+    <input id="fgConf" type="password" class="inp mb-1" autocomplete="new-password" maxlength="128">
+    <button id="verBtn" class="btn w-full mt-3" onclick="resetPw()"><i class="fa-solid fa-key"></i>Reset password</button>
+    <button id="resBtn" class="btn btn-ghost w-full mt-2" onclick="sendOtp()" disabled>Resend OTP</button>
+  </div>
+  <div id="fs3" class="hidden text-center">
+    <div class="text-4xl mb-2" style="color:var(--em)"><i class="fa-solid fa-circle-check"></i></div>
+    <p id="fDone" class="text-sm mb-4" style="color:var(--mut)"></p>
+    <button class="btn w-full" onclick="closeForgot()"><i class="fa-solid fa-unlock-keyhole"></i>Back to login</button>
+  </div>
+  <p id="fmsg" class="text-sm mt-3 text-center" style="min-height:1.25rem"></p>
+</div></div>
+
+<div id="connModal" class="modal"><div class="glass neon w-full max-w-md p-5 sm:p-6" style="background:#0e0e16">
+  <div class="mhead"><h3 class="serif text-xl"><i class="fa-solid fa-database mr-2" style="color:var(--cy)"></i>Database Connections</h3><button class="mx" onclick="closeM('connModal')" aria-label="Close">&times;</button></div>
+  <p class="text-sm mb-3" style="color:var(--mut)">Paste your Apps Script Web App URL (it must end in <b>/exec</b>). Leave empty to use local demo mode.</p>
+  <input id="urlIn" class="inp mb-3" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="flex gap-2"><button class="btn flex-1" onclick="saveUrl()">Save &amp; test</button><button class="btn btn-ghost" onclick="closeM('connModal')">Close</button></div>
+  <div class="flex gap-2 mt-2"><button class="btn btn-ghost flex-1 text-sm" onclick="resetUrl()">Use default URL</button><button class="btn btn-ghost flex-1 text-sm" onclick="runDiag()"><i class="fa-solid fa-stethoscope"></i>Run diagnostics</button></div>
+  <p id="connMsg" class="text-sm mt-3"></p>
+  <pre id="diagOut" class="hidden text-xs mt-3 p-3 rounded-xl overflow-x-auto whitespace-pre-wrap break-words" style="background:rgba(0,0,0,.5);max-height:50vh;overflow-y:auto"></pre>
+</div></div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="appView" class="hidden">
+<nav class="sticky top-0 z-50 glass" style="border-radius:0;border-width:0 0 1px 0">
+  <div class="max-w-6xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
+    <div class="brand-nav"><span class="brand-logo" style="--w:36px" role="img" aria-label="SHYNWELL logo"></span><span class="wm serif metal text-lg sm:text-2xl font-extrabold tracking-widest hidden min-[380px]:inline">SHYNWELL</span></div>
+    <div class="flex items-center gap-2" role="navigation" aria-label="Main">
+      <button id="navBill" class="navbtn active" onclick="showView('bill')" aria-label="New Order" title="New Order"><i class="fa-solid fa-file-invoice-dollar"></i><span class="lbl2">New Order</span></button>
+      <button id="navInv" class="navbtn" onclick="showView('inv')" aria-label="Inventory" title="Inventory"><i class="fa-solid fa-boxes-stacked"></i><span class="lbl2">Inventory</span></button>
+      <button id="navLinkBtn" class="navbtn" onclick="openLinkOptions()" aria-haspopup="dialog" aria-label="Link options" title="Link options"><i class="fa-solid fa-link"></i><span class="lbl2">Link</span></button>
+      <button class="navbtn" onclick="logout()" aria-label="Logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i><span class="lbl2">Logout</span></button>
+    </div>
+  </div>
+</nav>
+<div id="lowBanner" class="hidden px-4 pt-3" role="alert" aria-live="polite"></div>
+
+<datalist id="skuList"></datalist>
+<main id="billMain" class="max-w-6xl mx-auto p-3 sm:p-4 grid grid-cols-1 gap-5 lg:grid-cols-5 pb-28">
+  <!-- Section A -->
+  <section class="glass neon p-4 sm:p-5 lg:col-span-3 rise">
+    <h2 class="serif text-2xl mb-4">New order</h2>
+
+    <div class="rounded-2xl p-4 mb-5" style="border:1px dashed rgba(0,229,255,.5);background:rgba(0,229,255,.04)">
+      <p class="font-semibold mb-1"><i class="fa-solid fa-file-invoice mr-2" style="color:var(--cy)"></i>Invoice scanner <span class="text-xs font-normal" style="color:var(--mut)">(optional)</span></p>
+      <p class="text-xs mb-3" style="color:var(--mut)">Details fill in automatically and every field stays editable.</p>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="btn cursor-pointer text-sm text-center"><i class="fa-solid fa-camera"></i>Snap Invoice via Camera
+          <input id="camIn" type="file" accept="image/*" capture="environment" class="hidden"></label>
+        <label class="btn btn-gold cursor-pointer text-sm text-center"><i class="fa-solid fa-folder-open"></i>Browse Device / PDF
+          <input id="fileIn" type="file" accept="image/*,application/pdf" class="hidden"></label>
+      </div>
+      <div id="prev" class="hidden mt-4 flex items-center gap-3 p-3 rounded-xl" style="background:rgba(0,0,0,.4)">
+        <img id="prevImg" class="w-20 h-20 object-cover rounded-lg hidden" alt="Invoice preview">
+        <div id="prevPdf" class="w-20 h-20 rounded-lg hidden items-center justify-center text-4xl" style="background:rgba(255,107,129,.12);color:#ff6b81"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="flex-1 min-w-0"><p id="prevName" class="text-sm truncate"></p><p id="prevSize" class="text-xs" style="color:var(--mut)"></p><p id="scanMsg" class="text-xs mt-1" style="color:var(--cy)"></p><details class="mt-1 text-xs" style="color:var(--mut)"><summary class="cursor-pointer">Show scanned text</summary><pre id="ocrRaw" class="whitespace-pre-wrap max-h-32 overflow-auto mt-1"></pre></details></div>
+        <div class="flex flex-col gap-2"><button class="btn !py-1.5 !px-3 text-sm" onclick="parseFile()"><i class="fa-solid fa-wand-magic-sparkles"></i>Read</button><button class="btn btn-ghost !py-1 !px-3 text-xs" onclick="clearPrev()">Clear</button></div>
+      </div>
+    </div>
+
+    <form id="orderForm" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div><label class="lbl">Platform</label>
+        <select id="platform" class="inp" onchange="otherBox()"><option>Amazon</option><option>Meesho</option><option>Flipkart</option><option>Others</option></select>
+        <input id="platformOther" class="inp mt-2 hidden" placeholder="Specify platform"></div>
+      <div><label class="lbl">Order ID</label><input id="orderId" class="inp" required><p id="orderIdMsg" class="text-xs mt-1" style="color:#ff6b81"></p></div>
+      <div><label class="lbl">Customer name</label><input id="customerName" class="inp" required></div>
+      <div><label class="lbl">State</label><input id="state" class="inp"></div>
+      <div class="sm:col-span-2"><label class="lbl">Full delivery address</label><textarea id="address" rows="2" class="inp"></textarea></div>
+      <div><label class="lbl">Invoice date</label><input id="invoiceDate" type="date" class="inp"></div>
+      <div><label class="lbl">Shipping date</label><input id="shippingDate" type="date" class="inp"></div>
+      <div><label class="lbl">SKU ID</label><input id="skuId" class="inp" autocomplete="off">
+        <p class="text-xs mt-1" style="color:var(--mut)">Reference only &ndash; never changes inventory stock.</p>
+        <div id="secSkuBox" class="mt-3 rounded-xl p-3" style="border:1px dashed rgba(168,85,247,.45);background:rgba(168,85,247,.04)">
+          <p class="lbl !mb-1">Secondary SKU IDs <span style="opacity:.7">(optional)</span></p>
+          <p class="text-xs mb-2" style="color:var(--mut)">Inventory stock is reduced only for these.</p>
+          <div id="secSkuList" class="flex flex-col gap-2"></div>
+          <button type="button" class="btn btn-ghost !py-1.5 !px-3 text-xs mt-2" onclick="addSecSku()">+ Add Another SKU ID</button>
+        </div></div>
+      <div><label class="lbl">Payment type</label>
+        <div class="flex gap-5 pt-2 text-sm"><label><input type="radio" name="pay" value="COD" checked> COD</label><label><input type="radio" name="pay" value="Prepaid"> Prepaid</label></div></div>
+      <div class="sm:col-span-2"><label class="lbl">Customer price (Rs)</label><input id="customerPrice" type="number" step="0.01" class="inp"></div>
+      <div class="sm:col-span-2 grid grid-cols-3 gap-3">
+        <div><label class="lbl">CGST</label><input id="cgst" type="number" step="0.01" class="inp"></div>
+        <div><label class="lbl">SGST</label><input id="sgst" type="number" step="0.01" class="inp"></div>
+        <div><label class="lbl">IGST</label><input id="igst" type="number" step="0.01" class="inp"></div>
+      </div>
+      <div><label class="lbl">Original cost price (Rs) *</label><input id="originalPrice" type="number" step="0.01" class="inp" required oninput="liveA()"></div>
+      <div><label class="lbl">Sale price (Rs) *</label><input id="salePrice" type="number" step="0.01" class="inp" required oninput="liveA()"></div>
+      <p class="sm:col-span-2 text-sm" style="color:var(--mut)">Expected profit: <b id="liveA" style="color:var(--em)">Rs 0.00</b></p>
+      <div class="sm:col-span-2"><label class="lbl">Others / important notes</label><textarea id="notes" rows="2" class="inp"></textarea></div>
+      <!-- Attachments (Supabase Storage + DB) -->
+      <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+        <div class="attcard rounded-2xl p-4" style="border:1px dashed rgba(255,183,3,.5);background:rgba(255,183,3,.04)">
+          <p class="font-semibold mb-1 text-sm"><i class="fa-solid fa-file-invoice-dollar mr-2" style="color:var(--gd)"></i>Invoice file *</p>
+          <p class="text-xs mb-3" style="color:var(--mut)">PDF or image</p>
+          <label class="btn btn-gold cursor-pointer text-sm w-full"><i class="fa-solid fa-paperclip"></i>Choose invoice
+            <input id="invFileIn" type="file" accept=".pdf,application/pdf,image/*" class="hidden"></label>
+          <div id="attInvBox" class="hidden mt-3 flex items-center gap-3 p-2 rounded-xl min-w-0 max-w-full overflow-hidden" style="background:rgba(0,0,0,.4)">
+            <img id="attInvImg" class="attthumb object-cover rounded-lg hidden" alt="invoice thumbnail">
+            <div id="attInvPdf" class="attthumb rounded-lg hidden items-center justify-center text-2xl" style="background:rgba(255,107,129,.12);color:#ff6b81"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="flex-1 min-w-0"><span id="attInvName" class="attname text-xs"></span><span id="attInvMeta" class="attname text-xs" style="color:var(--mut)"></span></div>
+            <button type="button" class="text-lg flex-none" aria-label="Remove invoice" onclick="clearAtt('inv')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+        <div class="attcard rounded-2xl p-4" style="border:1px dashed rgba(0,229,255,.5);background:rgba(0,229,255,.04)">
+          <p class="font-semibold mb-1 text-sm"><i class="fa-solid fa-box-open mr-2" style="color:var(--cy)"></i>Packing parcel *</p>
+          <p class="text-xs mb-3" style="color:var(--mut)">Photo or PDF - from files or live camera</p>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="btn btn-ghost cursor-pointer text-sm"><i class="fa-solid fa-images"></i>Files
+              <input id="packGalIn" type="file" accept=".pdf,application/pdf,image/*" class="hidden"></label>
+            <label class="btn cursor-pointer text-sm"><i class="fa-solid fa-camera"></i>Camera
+              <input id="packCamIn" type="file" accept="image/*" capture="environment" class="hidden"></label>
+          </div>
+          <div id="attPackBox" class="hidden mt-3 flex items-center gap-3 p-2 rounded-xl min-w-0 max-w-full overflow-hidden" style="background:rgba(0,0,0,.4)">
+            <img id="attPackImg" class="attthumb object-cover rounded-lg hidden" alt="packing file thumbnail">
+            <div id="attPackPdf" class="attthumb rounded-lg hidden items-center justify-center text-2xl" style="background:rgba(255,107,129,.12);color:#ff6b81"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="flex-1 min-w-0"><span id="attPackName" class="attname text-xs"></span><span id="attPackMeta" class="attname text-xs" style="color:var(--mut)"></span></div>
+            <button type="button" class="text-lg flex-none" aria-label="Remove packing file" onclick="clearAtt('pack')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="sm:col-span-2"><button id="saveBtn" class="btn btn-gold w-full sm:w-auto"><i id="saveIco" class="fa-solid fa-cloud-arrow-up"></i><span id="saveTxt">Save order</span></button></div>
+    </form>
+  </section>
+
+  <!-- Section B -->
+  <section class="glass neon p-4 sm:p-5 lg:col-span-2 self-start rise" style="animation-delay:.12s">
+    <h2 class="serif text-2xl mb-4">Order lookup</h2>
+    <div class="flex gap-2"><input id="searchId" class="inp" placeholder="Enter Order ID" onkeydown="if(event.key==='Enter')searchOrder()"><button class="btn" onclick="searchOrder()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
+    <p id="lookMsg" class="text-sm mt-2" style="color:var(--mut)"></p>
+    <div id="lookBox" class="hidden mt-4">
+      <div id="lookInfo" class="text-sm rounded-xl p-3 mb-3 leading-relaxed break-words" style="background:rgba(0,0,0,.4)"></div>
+      <div id="lookLinks" class="hidden flex gap-2 mb-3 text-xs"></div>
+      <div id="lookSkus" class="hidden text-xs mb-3 break-words" style="color:var(--cy)"></div>
+      <details id="lookDetails" class="mb-3 rounded-xl p-3" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1)">
+        <summary class="cursor-pointer text-sm font-semibold" style="color:var(--cy)"><i class="fa-solid fa-pen-to-square mr-2"></i>View all / edit details</summary>
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <div class="col-span-2"><label class="lbl">Order ID</label><input id="eOrderId" class="inp"></div>
+          <div><label class="lbl">Platform</label><select id="ePlatform" class="inp"><option>Amazon</option><option>Meesho</option><option>Flipkart</option><option>Others</option></select></div>
+          <div><label class="lbl">Payment type</label><select id="ePay" class="inp"><option>COD</option><option>Prepaid</option></select></div>
+          <div class="col-span-2"><label class="lbl">Customer name</label><input id="eCust" class="inp"></div>
+          <div><label class="lbl">State</label><input id="eState" class="inp"></div>
+          <div><label class="lbl">SKU ID</label><input id="eSku" class="inp"></div>
+          <div class="col-span-2"><label class="lbl">Address</label><textarea id="eAddr" rows="2" class="inp"></textarea></div>
+          <div><label class="lbl">Invoice date</label><input id="eInvDate" type="date" class="inp"></div>
+          <div><label class="lbl">Shipping date</label><input id="eShipDate" type="date" class="inp"></div>
+          <div class="col-span-2"><label class="lbl">Customer price (Rs)</label><input id="ePrice" type="number" step="0.01" class="inp"></div>
+          <div><label class="lbl">CGST</label><input id="eCgst" type="number" step="0.01" class="inp"></div>
+          <div><label class="lbl">SGST</label><input id="eSgst" type="number" step="0.01" class="inp"></div>
+          <div class="col-span-2"><label class="lbl">IGST</label><input id="eIgst" type="number" step="0.01" class="inp"></div>
+          <div class="col-span-2"><label class="lbl">Notes</label><textarea id="eNotes" rows="2" class="inp"></textarea></div>
+        </div>
+      </details>
+      <div class="grid grid-cols-3 gap-2">
+        <div><label class="lbl">Original</label><input id="uOrig" type="number" step="0.01" class="inp" oninput="liveB()"></div>
+        <div><label class="lbl">Sale</label><input id="uSale" type="number" step="0.01" class="inp" oninput="liveB()"></div>
+        <div><label class="lbl">Credited</label><input id="uCred" type="number" step="0.01" class="inp" oninput="liveB()"></div>
+      </div>
+      <p class="mt-4 text-sm" style="color:var(--mut)">Net profit (credited price, else sale price, minus original price; a cancelled / returned order costs its loss amount)</p>
+      <p id="liveB" class="serif text-3xl font-bold" style="color:var(--em);text-shadow:0 0 18px currentColor">Rs 0.00</p>
+      <div id="rcBox" class="mt-4 rounded-xl p-3" style="border:1px dashed rgba(255,107,129,.45);background:rgba(255,107,129,.04)">
+        <p class="font-semibold text-sm mb-3"><i class="fa-solid fa-rotate-left mr-2" style="color:#ff6b81"></i>Return / cancellation</p>
+        <label class="lbl" for="rcStatus">Order status</label>
+        <select id="rcStatus" class="inp" onchange="rcToggle()">
+          <option value="">Normal order (no return / cancellation)</option>
+          <option value="Cancel">Cancel</option>
+          <option value="RTO">RTO (Return to Origin)</option>
+          <option value="Customer Return">Customer Return</option>
+        </select>
+        <div id="rcReasonBox" class="hidden mt-3">
+          <label class="lbl" for="rcReason">Cancellation reason <span style="color:#ff6b81">*</span></label>
+          <select id="rcReason" class="inp" onchange="rcToggle()">
+            <option value="">Select a reason</option>
+            <option value="Seller Issue">Seller Issue</option>
+            <option value="Pickup Associate Issue">Pickup Associate Issue</option>
+            <option value="Others">Others</option>
+          </select>
+          <input id="rcOther" class="inp mt-2 hidden" maxlength="120" placeholder="Please specify reason" autocomplete="off">
+        </div>
+        <div id="rcLossBox" class="hidden mt-3">
+          <label class="lbl" for="rcLoss">Loss Amount (&#8377;)</label>
+          <input id="rcLoss" type="number" min="0" step="0.01" inputmode="decimal" class="inp" placeholder="0.00" oninput="liveB()">
+          <p class="text-xs mt-1" style="color:var(--mut)">e.g. packaging cost, reverse shipping fee or damaged item cost. Leave empty for 0.</p>
+        </div>
+        <p id="rcErr" class="text-xs mt-2" style="color:#ff6b81"></p>
+      </div>
+      <button id="updBtn" class="btn btn-gold w-full mt-4" onclick="updateOrder()"><i id="updIco" class="fa-solid fa-floppy-disk"></i><span id="updTxt">Save / update changes</span></button>
+      <button id="delBtn" class="btn w-full mt-3" style="background:linear-gradient(135deg,#ff2d55,#c1121f);color:#fff" onclick="deleteOrder()"><i id="delIco" class="fa-solid fa-trash"></i><span id="delTxt">Delete Order</span></button>
+    </div>
+  </section>
+</main>
+
+<!-- ================= INVENTORY ================= -->
+<main id="invMain" class="hidden max-w-6xl mx-auto p-3 sm:p-4 pb-28">
+  <section class="glass neon p-4 sm:p-5 rise">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="serif text-2xl"><i class="fa-solid fa-boxes-stacked mr-2" style="color:var(--gd)"></i>Inventory</h2>
+      <button class="btn text-sm" onclick="invOpenAdd()"><i class="fa-solid fa-plus"></i>Add Inventory Item</button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+      <input id="invSearch" class="inp sm:col-span-2" placeholder="Search by SKU ID..." oninput="invRenderSoon()" autocomplete="off">
+      <div id="invCount" class="text-sm self-center" style="color:var(--mut)"></div>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-2">
+      <div class="relative">
+        <button id="invDlBtn" class="btn btn-gold text-sm" onclick="invTogglePop('invDlPop', event)" aria-haspopup="true"><i class="fa-solid fa-download"></i>Download<i class="fa-solid fa-chevron-down" style="font-size:.7rem"></i></button>
+        <div id="invDlPop" class="popmenu left" role="menu">
+          <button role="menuitem" onclick="invDownload('stock')"><i class="fa-solid fa-boxes-stacked" style="color:var(--em)"></i>Stock Report</button>
+          <button role="menuitem" onclick="invDownload('moves')"><i class="fa-solid fa-clock-rotate-left" style="color:var(--cy)"></i>Stock Movement</button>
+        </div>
+      </div>
+      <div class="relative">
+        <button id="invDelBtn" class="btn text-sm" style="background:linear-gradient(135deg,#ff2d55,#c1121f);color:#fff" onclick="invTogglePop('invDelPop', event)" aria-haspopup="true"><i class="fa-solid fa-trash"></i>Delete<i class="fa-solid fa-chevron-down" style="font-size:.7rem"></i></button>
+        <div id="invDelPop" class="popmenu left" role="menu">
+          <button role="menuitem" onclick="invDeleteData('stock')"><i class="fa-solid fa-boxes-stacked" style="color:#ff6b81"></i>Stock Report</button>
+          <button role="menuitem" onclick="invDeleteData('moves')"><i class="fa-solid fa-clock-rotate-left" style="color:#ff6b81"></i>Stock Movement</button>
+        </div>
+      </div>
+    </div>
+    <label class="text-xs flex items-center gap-2 mb-2" style="color:#ff9aa9"><input type="checkbox" id="invLowOnly" onchange="invRender()"> Show only low-stock items (stock at or below reorder level)</label>
+    <label class="text-xs flex items-center gap-2 mb-4" style="color:var(--mut)"><input type="checkbox" id="invFilteredOnly"> Export only the rows matching my search (otherwise everything is exported)</label>
+    <div class="flex flex-wrap items-center gap-2 text-xs mb-3"><i class="fa-solid fa-table-list" style="color:var(--gd)"></i><span id="invSheetMsg" style="color:var(--mut)">Inventory sheet: connect it with the link icon in the top bar (Cloud Config).</span><button class="chip" onclick="invMirrorNow(true)">Copy to sheet now</button></div>
+    <div class="overflow-x-auto rounded-xl" style="border:1px solid rgba(255,255,255,.1)">
+      <table class="w-full text-sm" style="min-width:680px">
+        <thead><tr style="background:rgba(255,255,255,.05);color:var(--mut)" class="text-left text-xs">
+          <th class="p-3">S.No</th><th class="p-3">SKU ID</th><th class="p-3">Stock</th><th class="p-3">Reorder</th><th class="p-3">Image</th><th class="p-3">Actions</th></tr></thead>
+        <tbody id="invBody"></tbody>
+      </table>
+    </div>
+    <p id="invMsg" class="text-sm mt-3" style="color:var(--mut)"></p>
+  </section>
+</main>
+<input id="invImgIn" type="file" accept="image/*" class="hidden">
+
+<div id="invItemModal" class="modal"><div class="glass neon w-full max-w-md p-5 sm:p-6" style="background:#0e0e16">
+  <h3 class="serif text-xl mb-3">Add Inventory Item</h3>
+  <label class="lbl">SKU ID</label><input id="invNewSku" class="inp mb-3" maxlength="64" autocomplete="off">
+  <label class="lbl">Opening stock quantity</label><input id="invNewQty" type="number" min="0" step="1" inputmode="numeric" class="inp mb-3" value="0">
+  <label class="lbl">Reorder level <span style="opacity:.7">(alert when stock is at or below this; blank = 1)</span></label><input id="invNewRe" type="number" min="0" step="1" inputmode="numeric" class="inp mb-2" value="1">
+  <p id="invItemErr" class="text-sm mb-3" style="color:#ff6b81"></p>
+  <div class="flex gap-2"><button id="invItemBtn" class="btn flex-1" onclick="invSaveItem()">Save item</button><button class="btn btn-ghost" onclick="closeM('invItemModal')">Cancel</button></div>
+</div></div>
+
+<div id="invStockModal" class="modal"><div class="glass neon w-full max-w-md p-5 sm:p-6" style="background:#0e0e16">
+  <h3 class="serif text-xl mb-1">Edit stock</h3><p id="invStockSku" class="text-sm mb-3" style="color:var(--gd)"></p>
+  <label class="lbl">New stock quantity</label><input id="invStockQty" type="number" min="0" step="1" inputmode="numeric" class="inp mb-3">
+  <label class="lbl">Reorder level <span style="opacity:.7">(low-stock alert at or below this; blank = 1)</span></label><input id="invStockRe" type="number" min="0" step="1" inputmode="numeric" class="inp mb-3">
+  <label class="lbl">Note (optional)</label><input id="invStockNote" class="inp mb-2" maxlength="120" placeholder="e.g. new stock received">
+  <p id="invStockErr" class="text-sm mb-3" style="color:#ff6b81"></p>
+  <div class="flex gap-2"><button id="invStockBtn" class="btn flex-1" onclick="invSaveStock()">Save stock</button><button class="btn btn-ghost" onclick="closeM('invStockModal')">Cancel</button></div>
+</div></div>
+
+<div id="invConnModal" class="modal"><div class="glass neon w-full max-w-md p-5 sm:p-6" style="background:#0e0e16">
+  <div class="mhead"><h3 class="serif text-xl"><i class="fa-solid fa-cloud mr-2" style="color:var(--gd)"></i>Cloud Config</h3><button class="mx" onclick="closeM('invConnModal')" aria-label="Close">&times;</button></div>
+  <div id="icA" class="hidden">
+    <p class="text-sm mb-3" style="color:var(--mut)">Paste the Web App URL of your inventory Apps Script (it must end in <b>/exec</b>). This is separate from your billing sheet.</p>
+    <input id="icUrl" class="inp mb-3" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+    <button class="btn w-full" onclick="invSaveUrl()">Save &amp; test</button>
+  </div>
+  <div id="icC" class="hidden">
+    <p id="icInfo" class="text-sm mb-3" style="color:var(--em)"></p>
+    <div class="grid grid-cols-1 gap-2">
+      <button class="btn btn-gold text-sm" onclick="invSyncToSheet()"><i class="fa-solid fa-cloud-arrow-up"></i>Replace sheet with app inventory (exact copy)</button>
+      <button class="btn text-sm" onclick="invSyncFromSheet()"><i class="fa-solid fa-cloud-arrow-down"></i>Sync Inventory Sheet &rarr; App</button>
+      <button class="btn btn-ghost text-sm" onclick="invOpenSheet()"><i class="fa-solid fa-table"></i>Get link to the inventory sheet</button>
+      <div id="icLinkBox" class="text-sm text-center"></div>
+      <button class="btn btn-ghost text-sm" onclick="invTest()"><i class="fa-solid fa-stethoscope"></i>Test connection</button>
+      <button class="btn btn-ghost text-sm" onclick="invMailNow('low')"><i class="fa-solid fa-triangle-exclamation" style="color:#ff6b81"></i>Send low-stock alert mail now</button>
+      <button class="btn btn-ghost text-sm" onclick="invMailNow('daily')"><i class="fa-solid fa-envelope" style="color:var(--cy)"></i>Send daily summary mail now</button>
+      <button class="btn btn-ghost text-sm" onclick="invMailNow('report')"><i class="fa-solid fa-table-list" style="color:var(--vi)"></i>Send inventory report mail now</button>
+    </div>
+    <p class="text-xs mt-3" style="color:var(--mut)">App changes are copied to the sheet automatically, and the script mails you at once when a SKU is at or below its reorder level. Rows you type only in the sheet stay there until you run &ldquo;Sync Inventory Sheet &rarr; App&rdquo;.</p>
+    <button type="button" class="mt-2 text-xs underline" style="color:var(--cy)" onclick="invChangeUrl()">Change script URL</button>
+  </div>
+  <p id="invConnMsg" class="text-sm mt-3" style="color:var(--mut);min-height:1.25rem"></p>
+</div></div>
+
+<div id="accModal" class="modal"><div class="glass neon w-full max-w-sm p-5 sm:p-6 text-center" style="background:#0e0e16" role="dialog" aria-modal="true" aria-labelledby="accTitle">
+  <span class="brand-logo mb-1" style="--w:44px"></span>
+  <div id="accStep1">
+    <p id="accLast" class="lastlogin"></p>
+    <i class="fa-solid fa-shield-halved text-3xl mb-2 block" style="color:var(--gd)"></i>
+    <h3 id="accTitle" class="serif text-xl mb-2">Send Verification Code to registered Gmail?</h3>
+    <p class="text-sm mb-4" style="color:var(--mut)">Inventory and the Link options hold critical business data. A 6-digit code will be emailed to <b id="accMail0" style="color:var(--em)">your registered Gmail</b> only after you tap Proceed.</p>
+    <p id="accMsg1" class="text-sm mb-2" style="min-height:1.25rem" role="alert"></p>
+    <div class="flex gap-2"><button id="accGo" class="btn flex-1" onclick="accProceed()"><i class="fa-solid fa-paper-plane"></i>Proceed</button><button class="btn btn-ghost flex-1" onclick="accCancel()">Cancel</button></div>
+  </div>
+  <div id="accStep2" class="hidden">
+    <h3 class="serif text-xl mb-1">Verification required</h3>
+    <p class="text-sm mb-4" style="color:var(--mut)">A 6-digit code was emailed to <b id="accMail" style="color:var(--em)">your registered Gmail</b>.</p>
+    <input id="accOtp" class="inp otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="------" oninput="accInput()" aria-label="6-digit code">
+    <p class="text-sm mt-2" style="color:var(--mut)">Code expires in <b id="accTime" style="color:var(--gd)">05:00</b></p>
+    <p id="accMsg" class="text-sm mt-2" style="min-height:1.25rem" role="alert"></p>
+    <div class="flex gap-2 mt-3"><button id="accVerBtn" class="btn flex-1" onclick="accVerify()"><i class="fa-solid fa-unlock-keyhole"></i>Verify</button><button id="accResBtn" class="btn btn-ghost flex-1" onclick="accSend(false)">Resend OTP</button></div>
+    <button class="mt-3 text-xs underline" style="color:var(--mut)" onclick="accCancel()">Cancel</button>
+  </div>
+</div></div>
+
+<div id="linkModal" class="modal" onclick="if(event.target===this)closeM('linkModal')"><div class="lm-card glass neon" role="dialog" aria-modal="true" aria-labelledby="lmTitle">
+  <button class="mx mclose" onclick="closeM('linkModal')" aria-label="Close">&times;</button>
+  <div class="lm-body">
+    <div class="lm-head"><span class="brand-logo" style="--w:38px"></span><h3 id="lmTitle" class="serif">Link options</h3><p>Verified. Choose what you want to open.</p></div>
+    <div class="lm-grid">
+      <div class="lm-item" style="--c:var(--em);--c2:var(--cy)"><span class="lm-ico"><i class="fa-solid fa-arrows-rotate"></i></span><b>Supabase Sync</b><span class="lm-sub">Keep your orders in Supabase and Google Sheets in step, both ways.</span><button class="btn" onclick="linkGo('sync')">Open</button></div>
+      <div class="lm-item" style="--c:var(--vi);--c2:#ff2bd6"><span class="lm-ico"><i class="fa-solid fa-right-left"></i></span><b>Sheet Migration</b><span class="lm-sub">Copy inventory or full records from one sheet to another.</span><button class="btn" onclick="linkGo('mig')">Open</button></div>
+      <div class="lm-item" style="--c:var(--gd);--c2:#ff8c42"><span class="lm-ico"><i class="fa-solid fa-cloud"></i></span><b>Cloud Config</b><span class="lm-sub">Inventory sheet link, test connection and mail reports.</span><button class="btn" onclick="linkGo('cloud')">Open</button></div>
+      <div class="lm-item" style="--c:var(--cy);--c2:#3b82f6"><span class="lm-ico"><i class="fa-solid fa-database"></i></span><b>Database Connections</b><span class="lm-sub">The billing Google Sheet web app address and diagnostics.</span><button class="btn" onclick="linkGo('db')">Open</button></div>
+    </div>
+  </div>
+</div></div>
+
+<div id="copyModal" class="modal"><div class="glass neon w-full max-w-xs p-5 text-center" style="background:#0e0e16">
+  <span class="brand-logo mb-2" style="--w:40px"></span>
+  <h3 class="serif text-lg mb-1">Your OTP code</h3>
+  <p class="text-xs mb-3" style="color:var(--mut)">From your SHYNWELL e-mail. Tap Copy, then paste it into the code box.</p>
+  <div id="copyCode" class="otp" style="letter-spacing:.35em;margin-right:-.35em;user-select:all"></div>
+  <button class="btn w-full mt-4" onclick="copyNow()"><i class="fa-regular fa-copy"></i>Copy OTP Code</button>
+  <p id="copyMsg" class="text-xs mt-2" style="min-height:1rem"></p>
+  <button class="btn btn-ghost w-full mt-2" onclick="closeM('copyModal')">Close</button>
+</div></div>
+
+<div id="mgModal" class="modal"><div class="glass neon w-full max-w-2xl p-5 sm:p-6" style="background:#0e0e16">
+  <div class="mhead"><h3 class="serif text-xl"><i class="fa-solid fa-right-left mr-2" style="color:#a855f7"></i>Sheet Migration</h3><button class="mx" onclick="closeM('mgModal')" aria-label="Close">&times;</button></div>
+  <div id="mgStep1">
+    <p class="text-sm mb-3" style="color:var(--mut)">What do you want to transfer?</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button class="btn btn-gold" onclick="mgChoose('inv')"><i class="fa-solid fa-boxes-stacked"></i>Option A: Inventory Data</button>
+      <button class="btn" onclick="mgChoose('db')"><i class="fa-solid fa-database"></i>Option B: Database / Full Records</button>
+    </div>
+  </div>
+  <div id="mgStep2" class="hidden">
+    <p class="text-sm mb-3"><b id="mgTypeLbl" style="color:var(--gd)"></b> <button type="button" class="text-xs underline ml-2" style="color:var(--cy)" onclick="mgBack()">Change</button></p>
+    <label class="lbl" for="mgFrom">Source (&ldquo;From&rdquo;) Webhook URL</label>
+    <input id="mgFrom" class="inp" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+    <p class="text-xs mt-1 mb-3" style="color:var(--mut)">Pre-filled with the script you are linked to. You can edit it.</p>
+    <label class="lbl" for="mgTo">Destination (&ldquo;To&rdquo;) Webhook URL</label>
+    <input id="mgTo" class="inp" placeholder="https://script.google.com/macros/s/.../exec (the target sheet's Web App)" autocomplete="off">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+      <button id="mgFwd" class="btn btn-gold text-sm" onclick="mgRun('fwd')"><i class="fa-solid fa-arrow-right"></i>Forward: Source &#10132; Destination</button>
+      <button id="mgRev" class="btn text-sm" onclick="mgRun('rev')"><i class="fa-solid fa-arrow-left"></i>Reverse: Destination &#10132; Source</button>
+    </div>
+    <div class="mt-4 rounded-xl p-3" style="background:rgba(0,0,0,.35)">
+      <div class="flex items-center gap-2 text-sm"><i id="mgSpin" class="fa-solid fa-spinner fa-spin hidden" style="color:var(--cy)"></i><span id="mgStatus" style="color:var(--mut)">Ready.</span></div>
+      <div class="mt-2 rounded-full" style="height:8px;background:rgba(255,255,255,.08);overflow:hidden"><div id="mgBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--em),var(--cy));transition:width .25s"></div></div>
+      <p id="mgSummary" class="text-sm mt-3 font-semibold"></p>
+      <div id="mgLogBox" class="hidden mt-3">
+        <div class="flex items-center justify-between gap-2 mb-2"><span class="text-xs" style="color:var(--mut)">Transfer log</span>
+          <select id="mgFilter" class="inp !py-1 !w-auto text-xs" onchange="mgRender()"><option value="all">All rows</option><option value="copied">Copied</option><option value="same">Up to date</option><option value="bad">Skipped &amp; failed</option></select></div>
+        <div class="overflow-auto rounded-lg" style="max-height:38vh;border:1px solid rgba(255,255,255,.1)">
+          <table class="w-full text-xs" style="min-width:520px"><thead><tr style="background:rgba(255,255,255,.05);color:var(--mut)" class="text-left"><th class="p-2">#</th><th class="p-2">Row ID / Item</th><th class="p-2">Name / Detail</th><th class="p-2">Result</th><th class="p-2">Reason</th></tr></thead><tbody id="mgBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <p id="mgNote" class="text-xs mt-3" style="color:var(--mut)">Rows are matched by their ID (SKU ID or Order ID). Nothing is ever deleted. Empty values never overwrite existing data.</p>
+  </div>
+  <button class="btn btn-ghost w-full mt-4" onclick="closeM('mgModal')">Close</button>
+</div></div>
+
+<div id="syncModal" class="modal"><div class="glass neon w-full max-w-md p-5 sm:p-6" style="background:#0e0e16">
+  <div class="mhead"><h3 class="serif text-xl"><i class="fa-solid fa-arrows-rotate mr-2" style="color:var(--em)"></i>Supabase Sync</h3><button class="mx" onclick="closeM('syncModal')" aria-label="Close">&times;</button></div>
+  <p class="text-sm mb-4" style="color:var(--mut)">Keeps your orders in <b>Supabase</b> and in your billing <b>Google Sheet</b> in step. Orders are matched by <b>Order ID</b>, so nothing is ever duplicated or deleted, and an empty value never overwrites existing data.</p>
+  <div class="grid grid-cols-1 gap-3">
+    <button id="syncBtn1" class="btn btn-gold" onclick="syncToSheet()"><i class="fa-solid fa-database"></i>Supabase &#10132; Google Sheets</button>
+    <button id="syncBtn2" class="btn" onclick="syncFromSheet()"><i class="fa-solid fa-table"></i>Google Sheets &#10132; Supabase</button>
+  </div>
+  <div class="mt-4 rounded-xl p-3" style="background:rgba(0,0,0,.35)">
+    <div class="flex items-center gap-2 text-sm"><i id="syncSpin" class="fa-solid fa-spinner fa-spin hidden" style="color:var(--cy)"></i><span id="syncStatus" style="color:var(--mut)">Ready.</span></div>
+    <div class="mt-2 rounded-full" style="height:8px;background:rgba(255,255,255,.08);overflow:hidden"><div id="syncBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--em),var(--cy));transition:width .25s"></div></div>
+    <div id="syncResult" class="text-xs mt-3 break-words"></div>
+  </div>
+  <div id="syncLast" class="text-xs mt-3" style="color:var(--mut)"></div>
+  <p class="text-xs mt-3" style="color:var(--mut)">Importing from the sheet records orders only: it never changes inventory stock. Stock is changed only when an order is saved in the app.</p>
+  <button class="btn btn-ghost w-full mt-4" onclick="closeM('syncModal')">Close</button>
+</div></div>
+
+<div id="invViewModal" class="modal" onclick="if(event.target===this)closeM('invViewModal')"><div class="glass neon w-full max-w-lg p-4 text-center" style="background:#0e0e16">
+  <p id="invViewSku" class="serif mb-3" style="color:var(--gd)"></p>
+  <img id="invViewImg" alt="Product image" class="mx-auto rounded-xl max-w-full" style="max-height:70vh">
+  <button class="btn btn-ghost mt-4" onclick="closeM('invViewModal')">Close</button>
+</div></div>
+
+<!-- AMAR -->
+<button onclick="toggleAmar()" class="fixed bottom-5 right-5 z-50 w-16 h-16 rounded-full text-2xl pulse-glow float" style="background:linear-gradient(135deg,var(--em),var(--cy));color:#04120b" aria-label="Open AMAR assistant"><i class="fa-solid fa-robot"></i></button>
+<aside id="drawer" aria-label="AMAR assistant">
+  <div class="p-3 flex items-center justify-between gap-2" style="border-bottom:1px solid rgba(255,255,255,.1)">
+    <div class="min-w-0 flex-1">
+      <p class="serif font-bold text-sm truncate" style="color:var(--em)">AMAR &mdash; SHYNWELL Store &amp; Seller Assistant</p>
+      <p class="text-xs truncate" style="color:var(--mut)"><span id="orderCount">0</span> orders &bull; <span id="modelIndicator" style="color:var(--gd)">gemini-3.8-flash</span></p>
+    </div>
+    <div class="flex items-center gap-1 flex-none">
+      <button type="button" onclick="toggleVoiceLive()" id="drawerVoiceBtn" class="btn btn-gold !py-1 !px-2.5 text-xs" style="min-height:32px" title="Live voice call with AMAR"><i class="fa-solid fa-microphone"></i><span class="ml-1">Voice</span></button>
+      <button type="button" onclick="clearChatHistory()" class="btn btn-ghost !py-1 !px-2 text-xs" style="min-height:32px" aria-label="Clear chat" title="Clear chat"><i class="fa-solid fa-trash-can"></i></button>
+      <button type="button" onclick="toggleAmar()" aria-label="Close" class="btn btn-ghost !py-1 !px-2 text-sm" style="min-height:32px"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+  <div class="px-3 py-1.5 flex items-center justify-between gap-2 text-xs" style="background:rgba(0,0,0,.35);border-bottom:1px solid rgba(255,255,255,.06)">
+    <label class="flex items-center gap-1.5 min-w-0"><span style="color:var(--mut)">Model</span>
+      <select id="amarModelSelect" class="inp !py-0.5 !px-2 text-xs" style="width:auto;max-width:11rem;height:26px" onchange="changeAmarModel(this.value)">
+        <option value="gemini-3.8-flash" selected>gemini-3.8-flash (General)</option>
+        <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Fast)</option>
+        <option value="gemini-4-argon">gemini-4-argon (Complex)</option>
+      </select></label>
+    <span class="text-[10px] truncate" style="color:var(--cy)">Jewellery &amp; Store Advisor</span>
+  </div>
+  <div id="amarVoicePanel" class="hidden p-3 text-center" style="background:linear-gradient(180deg,rgba(255,183,3,.15),rgba(0,0,0,.6));border-bottom:1px solid rgba(255,183,3,.3)">
+    <div class="flex items-center justify-between gap-2 mb-1.5">
+      <div class="flex items-center gap-1.5 min-w-0"><span class="inline-block w-2.5 h-2.5 rounded-full flex-none" id="voiceDot" style="background:var(--gd)"></span><span class="text-xs font-semibold truncate" id="voiceStatus" style="color:var(--gd)">Connecting...</span></div>
+      <span class="chip flex-none !py-0 !px-1.5 text-[9px]" style="color:var(--gd);border-color:var(--gd)">gemini-3.8-live</span>
+    </div>
+    <div class="my-2 flex items-center justify-center"><div id="voiceOrb" class="w-14 h-14 rounded-full flex items-center justify-center pulse-glow" style="background:linear-gradient(135deg,var(--gd),var(--em));color:#04120b"><i class="fa-solid fa-microphone text-lg"></i></div></div>
+    <div class="text-left rounded-lg p-2 mb-2 overflow-y-auto" style="max-height:6rem;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)">
+      <p id="voiceUserText" class="text-[11px] mb-1 italic" style="color:var(--cy)"></p>
+      <p id="voiceModelText" class="text-[11px]" style="color:var(--em)"></p>
+    </div>
+    <div class="flex items-center justify-center gap-2">
+      <button type="button" id="voiceMuteBtn" class="btn btn-ghost !py-1 !px-3 text-xs" onclick="toggleVoiceMute()"><i class="fa-solid fa-microphone"></i><span id="voiceMuteTxt" class="ml-1">Mute</span></button>
+      <button type="button" class="btn !py-1 !px-3 text-xs" style="background:linear-gradient(135deg,#ff2d55,#c1121f);color:#fff" onclick="stopVoiceCall()"><i class="fa-solid fa-phone-slash"></i><span class="ml-1">End call</span></button>
+    </div>
+  </div>
+  <div id="chat" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"></div>
+  <div class="px-3 py-2 flex gap-1.5 overflow-x-auto whitespace-nowrap">
+    <span class="chip" onclick="ask('What can you do?')">What can you do?</span>
+    <span class="chip" onclick="ask('How to care for 1-gram gold covering jewellery?', true)">1-Gram gold care</span>
+    <span class="chip" onclick="ask('What are trending bridal jewellery set pairings?', true)">Bridal sets</span>
+    <span class="chip" onclick="ask('How can I minimise COD return and RTO loss?', true)">COD return advice</span>
+    <span class="chip" onclick="ask('Platform margin analysis')">Margin analysis</span>
+    <span class="chip" onclick="ask('What is my average profit per order on Meesho compared to Amazon?')">Meesho vs Amazon</span>
+    <span class="chip" onclick="ask('Show orders with pending credited price reconciliation')">Pending credits</span>
+    <span class="chip" onclick="ask('Which state gives me the highest jewellery orders?')">Top state</span>
+    <span class="chip" onclick="ask('Calculate my total net profit for this month')">Profit this month</span>
+    <span class="chip" onclick="ask('Inventory insights')">Inventory</span>
+    <span class="chip" onclick="ask('Show platform share chart')">Platform chart</span>
+    <span class="chip" onclick="ask('Download PDF report')">PDF report</span>
+  </div>
+  <div class="px-3 pb-2 grid grid-cols-2 gap-2">
+    <button class="btn btn-ghost !py-2 text-sm" onclick="exportXlsx()"><i class="fa-solid fa-file-excel" style="color:var(--em)"></i>Excel</button>
+    <button class="btn btn-ghost !py-2 text-sm" onclick="exportPdf()"><i class="fa-solid fa-file-pdf" style="color:#ff6b81"></i>PDF</button>
+  </div>
+  <form class="p-3 flex gap-2" style="border-top:1px solid rgba(255,255,255,.1)" onsubmit="event.preventDefault();ask(q.value);q.value=''">
+    <button type="button" class="btn btn-ghost !px-3 flex-none" title="Live voice call" aria-label="Live voice call" onclick="toggleVoiceLive()" style="color:var(--gd)"><i class="fa-solid fa-microphone"></i></button>
+    <input id="q" class="inp min-w-0 flex-1" placeholder="Ask about your orders or jewellery..." autocomplete="off"><button class="btn !px-4 flex-none" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+  </form>
+</aside>
+</div>
+<div id="toast"></div>
+</div><!-- /shell -->
+
+<script src="app.js"></script>
+</body>
+</html>
