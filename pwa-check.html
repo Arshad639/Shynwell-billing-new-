@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHYNWELL PWA check</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+body{margin:0;padding:14px;background:#0b0a10;color:#eee;font:14px/1.45 system-ui,sans-serif}
+h1{font-size:18px;margin:0 0 10px;color:#d4af37}
+.r{padding:7px 9px;margin:5px 0;border-radius:8px;background:#17151f;word-break:break-word}
+.ok{border-left:4px solid #3ecf6e}.bad{border-left:4px solid #ff5a5a}.warn{border-left:4px solid #f5b83d}.info{border-left:4px solid #6aa5ff}
+b{display:block}small{color:#aaa}
+button{margin:8px 6px 0 0;padding:10px 14px;border:0;border-radius:8px;background:#d4af37;color:#111;font-weight:700}
+</style></head><body>
+<h1>SHYNWELL PWA check</h1>
+<div id="out"></div>
+<button id="inst" style="display:none">Install now</button>
+<button id="cp">Copy report</button>
+<script>
+var out=document.getElementById('out'),rep=[],ev=null;
+function add(t,title,detail){rep.push((t==='ok'?'[OK] ':t==='bad'?'[FAIL] ':t==='warn'?'[WARN] ':'[INFO] ')+title+(detail?' - '+detail:''));
+var d=document.createElement('div');d.className='r '+t;var b=document.createElement('b');b.textContent=title;d.appendChild(b);
+if(detail){var s=document.createElement('small');s.textContent=detail;d.appendChild(s);}out.appendChild(d);}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;document.getElementById('inst').style.display='inline-block';add('ok','Chrome fired the install event','Install is possible. Tap "Install now".');});
+document.getElementById('inst').onclick=function(){if(ev)ev.prompt();};
+document.getElementById('cp').onclick=function(){var t=rep.join('\n');try{navigator.clipboard.writeText(t).then(function(){alert('Copied')},function(){prompt('Copy:',t)});}catch(e){prompt('Copy:',t);}};
+async function head(url){var r=await fetch(url,{cache:'no-store',credentials:'omit'});return r;}
+(async function(){
+ var ua=navigator.userAgent;
+ add('info','Page',location.href);
+ add(location.protocol==='https:'||location.hostname==='localhost'?'ok':'bad','HTTPS',location.protocol==='https:'?'secure':'PWA needs https (or localhost). Now: '+location.protocol);
+ if(/FBAN|FBAV|Instagram|WhatsApp|Line\/|MicroMessenger|Telegram|; wv\)/i.test(ua))add('bad','In-app browser detected','Open the link in the real Chrome app. In-app browsers cannot install PWAs.');
+ else if(/Chrome\//.test(ua)&&!/Edg\/|OPR\/|SamsungBrowser/.test(ua))add('ok','Browser looks like Chrome');
+ else add('warn','Browser is not plain Chrome',ua);
+ if(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)add('info','Already running as installed app');
+ try{var est=await navigator.storage.estimate();if(est&&est.quota&&est.quota<130e6)add('warn','Tiny storage quota (Incognito?)','Incognito tabs cannot install. Use a normal tab.');}catch(e){}
+ // manifest
+ var man=null;
+ try{var r=await head('manifest.webmanifest');var ct=r.headers.get('content-type')||'';
+  if(r.status!==200)add('bad','manifest.webmanifest HTTP '+r.status,'Must be 200. 401 = Vercel Deployment Protection is on. 404 = file not in the site root.');
+  else{add(r.redirected?'bad':'ok','manifest fetch','status 200'+(r.redirected?' but REDIRECTED to '+r.url:'')+', type: '+ct);
+   var txt=await r.text();try{man=JSON.parse(txt);add('ok','manifest is valid JSON');}catch(e){add('bad','manifest is NOT valid JSON','Server sent something else (probably index.html). First chars: '+txt.slice(0,60).replace(/\s+/g,' '));}}
+ }catch(e){add('bad','manifest fetch failed',String(e));}
+ if(man){
+  add(man.name||man.short_name?'ok':'bad','name / short_name',(man.name||'')+' / '+(man.short_name||''));
+  add(['standalone','fullscreen','minimal-ui'].indexOf(man.display)>-1?'ok':'bad','display',String(man.display));
+  try{var su=new URL(man.start_url||'./',new URL('manifest.webmanifest',location.href));
+   var sr=await head(su.href);add(sr.status===200&&!sr.redirected?'ok':'bad','start_url '+su.pathname,'HTTP '+sr.status+(sr.redirected?', REDIRECTED to '+sr.url+' (start_url must not redirect)':''));}catch(e){add('bad','start_url fetch failed',String(e));}
+  var has192=false,has512=false;
+  for(var i=0;i<(man.icons||[]).length;i++){var ic=man.icons[i];
+   try{var u=new URL(ic.src,new URL('manifest.webmanifest',location.href)).href;var ir=await head(u);var ict=ir.headers.get('content-type')||'';
+    if(ir.status!==200){add('bad','icon '+ic.src+' HTTP '+ir.status,'Icon must load with 200');continue;}
+    var blob=await ir.blob();var url=URL.createObjectURL(blob);
+    var dim=await new Promise(function(res){var im=new Image();im.onload=function(){res(im.naturalWidth+'x'+im.naturalHeight)};im.onerror=function(){res('UNREADABLE')};im.src=url;});
+    var okType=/image\/png/.test(ict)&&ic.type==='image/png';
+    var good=dim===ic.sizes&&okType;
+    add(good?'ok':'bad','icon '+ic.src+' ('+(ic.purpose||'any')+')','declared '+ic.sizes+', real '+dim+', type '+ict);
+    if(good&&(ic.purpose||'any').indexOf('any')>-1){if(dim==='192x192')has192=true;if(dim==='512x512')has512=true;}
+   }catch(e){add('bad','icon '+ic.src+' failed',String(e));}}
+  add(has192&&has512?'ok':'bad','192px and 512px "any" PNG icons',has192&&has512?'both present':'one is missing or wrong');
+ }
+ // service worker
+ try{var sw=await head('sw.js');var sct=sw.headers.get('content-type')||'';
+  if(sw.status!==200)add('bad','sw.js HTTP '+sw.status,'Must be 200 from the site root.');
+  else add(/javascript|ecmascript/.test(sct)&&!sw.redirected?'ok':'bad','sw.js fetch','type: '+sct+(sw.redirected?' REDIRECTED':'')+' (must be a JavaScript type)');
+ }catch(e){add('bad','sw.js fetch failed',String(e));}
+ if(!('serviceWorker' in navigator))add('bad','Service workers not supported here');
+ else{
+  try{var reg=await navigator.serviceWorker.register('sw.js');add('ok','Service worker registered','scope '+reg.scope);
+   await Promise.race([navigator.serviceWorker.ready,sleep(8000)]);
+   add(reg.active?'ok':'warn','Service worker state',reg.active?reg.active.state:'not active yet - reload this page once');
+  }catch(e){add('bad','Service worker register FAILED',String(e&&e.message||e));}
+ }
+ await sleep(2500);
+ if(!ev)add('warn','Install event not fired (yet)','If everything above is green: wait 10-20s, reload once, or Chrome already thinks the app is installed / you dismissed the prompt before (try Chrome menu > Install app).');
+ add('info','User agent',ua);
+})();
+</script></body></html>
